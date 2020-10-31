@@ -1,12 +1,6 @@
 import numpy as np
 import pandas as pd
 
-def split(dataset, n_train):
-    rand_range = np.arange(dataset.index[0], dataset.index[-1])
-    train_index = np.random.choice(rand_range, n_train, replace=False)
-    test_index = ~dataset.index.isin(train_index)
-    return dataset.loc[train_index], dataset.loc[test_index]
-
 def split_dataset(*,dataset_name,label_name,train_per,write_file=True):
     dataset_file = f'{dataset_name}.xlsx'
     dataset = pd.read_excel (dataset_file, sheet_name=f'{dataset_name}_standardized')
@@ -41,13 +35,29 @@ def split_dataset(*,dataset_name,label_name,train_per,write_file=True):
 
     train_sample = pd.concat([train_sample_a, train_sample_p], axis=0)
     test_sample = pd.concat([test_sample_a, test_sample_p], axis=0)
+    train_sample.index.name = 'ID'
+    test_sample.index.name = 'ID'
 
     if (write_file):
-        with pd.ExcelWriter(dataset_file, mode='a') as writer:
-            train_sample.to_excel(writer, sheet_name=f'{dataset_name}_train')
-            test_sample.to_excel(writer, sheet_name=f'{dataset_name}_test')
+        write_excel(dataset_file, f'{dataset_name}_train', train_sample)
+        write_excel(dataset_file, f'{dataset_name}_test', test_sample)
 
     return train_sample, test_sample
 
+def split(dataset, n_train):
+    rand_range = np.arange(dataset.index[0], dataset.index[-1])
+    train_index = np.random.choice(rand_range, n_train, replace=False)
+    test_index = ~dataset.index.isin(train_index)
+    return dataset.loc[train_index], dataset.loc[test_index]
 
-train_sample, test_sample = split_dataset(dataset_name='heart', label_name='Label', write_file=False)
+
+def write_excel(filename,sheetname,dataframe):
+    with pd.ExcelWriter(filename, engine='openpyxl', mode='a') as writer:
+        workBook = writer.book
+        try:
+            workBook.remove(workBook[sheetname])
+        except:
+            print(f"{sheetname} does not exist")
+        finally:
+            dataframe.to_excel(writer, sheet_name=sheetname)
+            writer.save()
