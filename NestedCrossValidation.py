@@ -1,8 +1,7 @@
 import numpy as np
 from numpy import mean
 from numpy import std
-from sklearn.svm import LinearSVC
-from sklearn.svm import SVC
+from sklearn.svm import LinearSVC, SVC
 from sklearn.model_selection import  GridSearchCV, KFold
 from sklearn.metrics import accuracy_score
 import pandas as pd
