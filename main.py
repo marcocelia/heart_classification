@@ -4,7 +4,7 @@ from NestedCrossValidation import nested_cross_validation
 from TrainAndTest import train_and_test, plot_report
 
 ## Analisys Parameters
-kernel = 'linear'
+kernel = 'rbf'
 
 if kernel == 'linear':
     gridHyperPar = {"C": [0.001, 0.01, 0.1, 1, 10, 100]}
@@ -50,7 +50,9 @@ score, bestHyperParameter, y_predictions = train_and_test(
     log_time=elapsed_time
 )
 print('\nAccuracy = %.3f, Best Hyper Parameter = %.3f\n' % (score, bestHyperParameter))
-print(elapsed_time)
+for k in elapsed_time:
+    print(f"{k}:{elapsed_time[k]/1000} sec")
+print()
 
 plot_report(
     y_test,
